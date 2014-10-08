@@ -49,7 +49,7 @@ Implement api for getting new by http get method
   
       sudo python ./sysunews/server.py
 
-### main dependence
+### Main dependence
   python
   
       - urllib, urllib2, cookiejar: deal with HTTP request
