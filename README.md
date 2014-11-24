@@ -34,7 +34,7 @@ Implement api for getting new by http get method
           
   For more details please view [sysunews API.docx]
 
-### How to use
+### How to deploy
   Database prepare:
   
       mysql -u sysunews -p sysunews
