@@ -3,15 +3,18 @@ import socket
 import urllib2
 import cookielib
 import re
+import os
 import post_module
 import html_extracting
 import db_module
 
-default_timeout = 0.2
+default_timeout = 10
 socket.setdefaulttimeout(default_timeout)
 
 cookie = cookielib.CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
+
+hostIP = os.popen('ifconfig | grep inet | grep -v inet6 | grep -v 127 | cut -d ":" -f 2 | cut -d " " -f 1').read()[:-1]
 
 def get_index_range(data):
     return html_extracting.find_index_range(data)
@@ -29,8 +32,7 @@ def get_newsid_firstpage(module):
     urls = html_extracting.find_news_urls(result, module)
     for url in urls:
         newsid = get_newsid(url)
-        if not db_module.check_news("news", newsid):
-            newsids.append(newsid)
+        newsids.append(newsid)
 
     return newsids
 
@@ -48,10 +50,12 @@ def get_news_urls(module):
     urls.extend(html_extracting.find_news_urls(result, module))
 
     # index1.htm to end will be crawled in the following loop
+    socket.setdefaulttimeout(100)
     for i in range(int(start), int(end) + 1):
         req = post_module.req_get_news_urls(module, i)
         result = opener.open(req).read()
         urls.extend(html_extracting.find_news_urls(result, module))
+    socket.setdefaulttimeout(10)
 
     return urls
 
@@ -100,11 +104,8 @@ def get_news_fromDB(module, start=1, num=-1):
         for pattern in patterns:
             news["maindiv"] = news["maindiv"].replace(pattern, "")
 
-        #news["maindiv"] = news["maindiv"].replace(u'阅读次数：', u'阅读次数：' + str(news["visit_times"]))
         news["maindiv"] = re.sub(u'阅读次数：<script.*?/script>', u'阅读次数：' + str(news["visit_times"]), news["maindiv"])
-        #news["maindiv"] = re.sub('../images', u'file:///home/zheng/文档/5Dtest/images', news["maindiv"])
-        #news["maindiv"] = re.sub('../images', 'http://news2.sysu.edu.cn/images', news["maindiv"])
-        news["maindiv"] = re.sub('../images', 'http://172.18.35.80:1234/home/images', news["maindiv"])
-        #news["maindiv"] = re.sub('../images', 'http://localhost:1234/home/images', news["maindiv"])
+        news["maindiv"] = re.sub('/home/sysunews/images', "/home/images", news["maindiv"])
+        news["maindiv"] = re.sub('(?<!home)/images', "/home/images", news["maindiv"])
 
     return newslist

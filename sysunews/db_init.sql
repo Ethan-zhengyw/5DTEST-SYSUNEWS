@@ -1,21 +1,10 @@
 /*grant all privileges on sysunewsDB.* to sysunews@localhost identified by 'sysunews';*/
 
-create database if not exists sysunews;
+insert into mysql.user(Host,User,Password) values("localhost","sysunews",password("sysunews"));
 
-use sysunews;
+create database if not exists sysunewsDB;
 
-/*create table teacher_table
-
-(
-
-teacher_id int auto_increment,
-
-teacher_name varchar(255),
-
-primary key(teacher_id)
-
-);
-*/
+use sysunewsDB;
 
 drop table urls;
 create table if not exists urls 
@@ -43,3 +32,6 @@ create table if not exists news
     maindiv varchar(15000),
     PRIMARY KEY (newsid)
 )default charset=utf8;
+
+flush privileges;
+grant all privileges on sysunewsDB.* to sysunews@localhost identified by 'sysunews';

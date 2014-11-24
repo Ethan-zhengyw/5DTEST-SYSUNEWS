@@ -1,16 +1,30 @@
 #-*-encoding: utf-8-*-
 import web
 import json
+import thread
+import time
 import api
+import db_update
+import db_module
 
-# http://localhost:1234/news?module=2&start=504&num=1
 urls = (
     '/news', 'Getnews',
     '/newshtml', 'Getnews_html',
+    '/able', 'GetnewsNum',
     '(/home/images/.*)', 'Images'
 )
 
 app = web.application(urls, globals())
+
+class GetnewsNum:
+
+    def GET(self):
+        web.header("Content-Type","application/json; charset=utf-8")
+        data = web.input(module="module")
+        module = data["module"]
+        count = db_module.get_module_newsNum(module)
+        result = json.dumps({"count": count})
+        return result
 
 class Getnews:
 
@@ -67,7 +81,6 @@ class Images:
 
     def GET(self, url):
         try:
-            print url
             f = open(url, 'r')
             image = f.read()
             f.close()
@@ -75,5 +88,14 @@ class Images:
         except:
             return '' # you can send an 404 error here if you want
 
+
+# update news every x minutes
+def update_news_intime(minutes):
+    while True:
+        db_update.update()
+        time.sleep(60 * minutes)
+
+
 if __name__ == "__main__":
+    thread.start_new_thread(update_news_intime, (10,))
     app.run()
