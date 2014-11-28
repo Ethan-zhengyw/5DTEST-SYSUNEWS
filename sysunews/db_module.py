@@ -1,3 +1,6 @@
+#-*- coding: utf-8 -*-
+"""Module to process database
+"""
 import os
 import os.path
 import urllib
@@ -17,7 +20,15 @@ cursor = con.cursor()
 hostIP = os.popen('ifconfig | grep inet | grep -v inet6 | grep -v 127 | cut -d ":" -f 2 | cut -d " " -f 1').read()[:-1]
 
 def save_urls(urls):
+    """Save the urls into database
 
+    Note:
+        When url is already in database, it will just ignore it quietly
+
+    Args:
+        urls (list): url list
+
+    """
     #print " saving urls into sysunewsDB.urls...\n+------------------------------------"
     count = 0
     length = len(urls)
@@ -39,7 +50,15 @@ def save_urls(urls):
 
 
 def save_news(news):
+    """Save news into database
 
+    Note:
+        Will check whether the news is already in database
+    
+    Args:
+        news (dict): a news dictionary 
+
+    """
     if check_news(api.get_newsid(news["url"])):
         return
 
@@ -73,6 +92,16 @@ def save_news(news):
 
 
 def save_img(url):
+    """Save the image
+
+    Note:
+        the images will be save in directory /home/images/
+        and it will check whether it's already exists
+
+    Args:
+        url (str): the url of the image, like [images/content/2014-11/20141124172306071544.jpg]
+
+    """
     dirname = '/home/' + url[:url.rfind('/')]
     filename = '/home/' + url
 
@@ -88,7 +117,17 @@ def save_img(url):
 
 
 def check_news(tablename, newsid):
+    """Check whether the news already exist
 
+    Can do this in two different ways: refer to table urls or news
+
+    Args:
+        tablename (str): 
+
+    Return:
+        bool: return true if find new with the same newsid in database else return False
+
+    """
     cursor.execute('select newsid from ' + tablename + ' where newsid = %s', newsid)
     result = cursor.fetchone()
 
@@ -96,13 +135,41 @@ def check_news(tablename, newsid):
 
 
 def cleandb():
+    """Clean the database
 
+    This fuction will delete two table: urls and news in sysunewsDB
+
+    """
     cursor.execute('truncate table urls')
     cursor.execute('truncate table news')
     con.commit()
 
 
 def get_news(module, start, num):
+    """Query data from database
+
+    When querying news from DB, the news will be return according to the order of update time, which means the start 1 is the newest news
+
+    Args:
+        module (int): find news from which module
+        start (int): the start index in DB
+        num (int): how many news want to get
+
+    Returns:
+        list: a list of news, every news is a dictionary
+
+    """
+    patterns = ['\r', '\n', '\t', 'NULL']
+    newslist = db_module.get_news(module, start, num)
+    for news in newslist:
+        for pattern in patterns:
+            news["maindiv"] = news["maindiv"].replace(pattern, "")
+
+        news["maindiv"] = re.sub(u'阅读次数：<script.*?/script>', u'阅读次数：' + str(news["visit_times"]), news["maindiv"])
+        news["maindiv"] = re.sub('/home/sysunews/images', "/home/images", news["maindiv"])
+        news["maindiv"] = re.sub('(?<!home)/images', "/home/images", news["maindiv"])
+
+    return newslist
 
     patterns = ["newsid", "module", "visit_times", "date", "url", "imgs", "author", "editor", "h1", "h2", "source", "maindiv"]
     result = []
@@ -128,7 +195,15 @@ def get_news(module, start, num):
 
 
 def check_news(newsid):
+    """Check whether the news already exist in table urls
 
+    Args:
+        tablename (str): 
+
+    Return:
+        bool: return true if find new with the same newsid in table urls else return False
+
+    """
     sql = 'select * from urls where newsid=' + str(newsid)
     cursor.execute(sql)
     for item in cursor.fetchall():
@@ -140,6 +215,15 @@ def check_news(newsid):
 
 
 def get_module_newsNum(module):
+    """get the num of news is certain module
+
+    Args:
+        module (int): find news number of which module
+
+    Returns:
+        int: the number of news of certain module in database
+
+    """
     sql = 'select count(newsid) from urls where module=' + str(module)
     cursor.execute(sql)
     for item in cursor.fetchall():

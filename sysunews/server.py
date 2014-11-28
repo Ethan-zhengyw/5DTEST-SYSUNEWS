@@ -1,12 +1,19 @@
-#-*-encoding: utf-8-*-
+#-*- coding: utf-8 -*-
+"""server module
+
+This module help to run a server program to solve HTTP get request from client base on webpy framwork
+
+"""
 import web
 import json
 import thread
 import time
+
 import api
 import db_update
 import db_module
 
+# urls mapping
 urls = (
     '/news', 'Getnews',
     '/newshtml', 'Getnews_html',
@@ -17,8 +24,22 @@ urls = (
 app = web.application(urls, globals())
 
 class GetnewsNum:
+    """Class to solve url /able
 
+    Request url must contains a parameter::
+        /able?module=1
+
+    """
     def GET(self):
+        """get the num of news is certain module
+
+        Returns:
+            json: key - count & value - the number of news of certain module in database::
+                {
+                    "count": 1000
+                }
+
+        """
         web.header("Content-Type","application/json; charset=utf-8")
         data = web.input(module="module")
         module = data["module"]
@@ -27,8 +48,18 @@ class GetnewsNum:
         return result
 
 class Getnews:
+    """Class to solve url /news
+    
+    Can solve url with three parameters::
+        /news?module=1&start=1&num=1
 
+    """
     def GET(self):
+        """Get news as json object
+
+        Will return a list of news in json type
+
+        """
         web.header("Content-Type","application/json; charset=utf-8")
 
         data = web.input(module="module", start="start", num="num", type="type")
@@ -55,8 +86,18 @@ class Getnews:
 
 
 class Getnews_html:
+    """Class to solve url /news
+    
+    Can solve url with three parameters::
+        /news?module=1&start=1&num=1
 
+    """
     def GET(self):
+        """get html content of news
+        
+        Will return html contents of news that being request, can display in a pretty way in browser
+
+        """
         web.header("Content-Type","text/html; charset=utf-8")
 
         data = web.input(module="module", start="start", num="num")
@@ -78,8 +119,19 @@ class Getnews_html:
 
 
 class Images:
+    """Handler that solve url /home/images/*
+    """
 
     def GET(self, url):
+        """Get a images with a url
+
+        Note:
+            the url is the path to a images that has been saved in local directory /home/images/
+
+        Args:
+            url (str): image url like [/home/images/content/...]
+
+        """
         try:
             f = open(url, 'r')
             image = f.read()
@@ -91,11 +143,17 @@ class Images:
 
 # update news every x minutes
 def update_news_intime(minutes):
+    """update the news database
+    
+    Args:
+        minutes (int): update the database every 10 minutes when minutes = 10
+
+    """
     while True:
         db_update.update()
         time.sleep(60 * minutes)
 
 
 if __name__ == "__main__":
-    thread.start_new_thread(update_news_intime, (10,))
-    app.run()
+    thread.start_new_thread(update_news_intime, (10,)) # start a thread to update the database every 10 minutes
+    app.run() # start the web server

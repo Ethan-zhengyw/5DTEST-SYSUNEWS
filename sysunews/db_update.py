@@ -6,6 +6,15 @@ import errno
 
 diction = {1: "中大新闻", 2: "每周聚焦", 3: "媒体中大"}
 def initial():
+    """Initialize the database
+
+    This function will get all possible news url from the website and save them into database when it's not exist
+    
+    Note:
+        Should be call by user::
+            sudo python db_initial.py
+
+    """
     modules = [3, 2, 1]
     urls = []
     ok_urls = [] #url of news that have been save successfully
@@ -36,6 +45,11 @@ def initial():
 
 
 def update():
+    """update the database
+
+    This function will be use in server.py to check whether there is new news post into the website every 10 minutes and save new news into database,
+
+    """
     for module in [1, 2, 3]:
         key = False # new news found or not
         print "updating module,", diction[module], 

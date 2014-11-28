@@ -1,13 +1,30 @@
 #-*-encoding: utf-8-*-
+"""HTML content processing
+
+This file is the module to processing html content, using regular expression module to match the target content and return them to function in api mainly.
+
+"""
 import urllib2
 import cookielib
 import re
+
 import post_module
 
 cookie = cookielib.CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
 
 def find_index_range(data):
+    """find the index range
+
+    Args:
+        data (str): content of [http://news2.sysu.edu.cn/news0*/index.htm]
+
+    Returns:
+        start, end: two integer, corresponding to the start and the end of index
+
+    """
+
+    return html_extracting.find_index_range(data)
 
     regexp = '(?<=href="index)(\d+)'
     indexes = re.findall(regexp, data)
@@ -19,6 +36,15 @@ def find_index_range(data):
 
 
 def find_news_urls(data, module):
+    """Find news url in data
+
+    Args:
+        data (str): content of a page ex.[http://news2.sysu.edu.cn/news01/index1.htm]
+
+    Returns:
+        list: a url list
+
+    """
 
     urls = []
 
@@ -41,6 +67,15 @@ def find_news_urls(data, module):
 #     }
 # -----------------------------
 def find_news(data):
+    """Extracting the news attributes from data
+
+    Args:
+        data (str): the conten of a news html page
+
+    Returns:
+        dict: return a structed news
+
+    """
     news = {}
 
     # find title h1 and h2
@@ -96,10 +131,28 @@ def find_news(data):
 
 
 def find_module(url):
+    """Get the module id of a news from its url
+    
+    Args:
+        url (str): news' url
+
+    Returns:
+        str: the module id
+
+    """
 
     return re.search('news0(\d+)', url).group(1)
 
 
 def find_newsid(url):
+    """Get the newsid of a news from its url
+    
+    Args:
+        url (str): news' url
+
+    Returns:
+        str: the newsid
+
+    """
     
     return re.search('(\d+)\.htm', url).group(1)

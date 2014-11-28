@@ -1,28 +1,53 @@
 #-*-encoding: utf-8-*-
+"""api module, call by db_update module mainly
+
+Function in this module mainly call function in html_extracting module to finish their job.
+
+"""
 import socket
 import urllib2
 import cookielib
 import re
 import os
+
 import post_module
 import html_extracting
 import db_module
 
 default_timeout = 10
 socket.setdefaulttimeout(default_timeout)
-
 cookie = cookielib.CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
 
-hostIP = os.popen('ifconfig | grep inet | grep -v inet6 | grep -v 127 | cut -d ":" -f 2 | cut -d " " -f 1').read()[:-1]
+#hostIP = os.popen('ifconfig | grep inet | grep -v inet6 | grep -v 127 | cut -d ":" -f 2 | cut -d " " -f 1').read()[:-1]
 
 def get_index_range(data):
+    """find the index range
+
+    Args:
+        data (str): content of [http://news2.sysu.edu.cn/news0*/index.htm]
+
+    Returns:
+        start, end: two integer, corresponding to the start and the end of index
+
+    """
+
     return html_extracting.find_index_range(data)
 
 
-# get the newsid in the first page of three module 
-# in order to check whether some new news has been post
 def get_newsid_firstpage(module):
+    """find the newsid
+
+    get the newsid in the first page of three module 
+    in order to check whether some new news has been post
+
+    Args:
+        module (int): module to get, range form 1 to 3
+
+    Returns:
+        a list of newsid
+
+    """
     newsids = []
 
     url = 'http://news2.sysu.edu.cn/news0' + str(module) + '/index.htm'
@@ -38,6 +63,15 @@ def get_newsid_firstpage(module):
 
 
 def get_news_urls(module):
+    """Get all urls of certain module
+    
+    Args:
+        module (int): urls of which module to get
+
+    Returns:
+        a list of urls
+
+    """
     urls = []
 
     # get index range firstly
@@ -61,16 +95,45 @@ def get_news_urls(module):
 
 
 def get_module(url):
+    """Get the module id of a news from its url
+    
+    Args:
+        url (str): news' url
+
+    Returns:
+        str: the module id
+
+    """
 
     return html_extracting.find_module(url)
 
 
 def get_newsid(url):
+    """Get the newsid of a news from its url
+    
+    Args:
+        url (str): news' url
+
+    Returns:
+        str: the newsid
+
+    """
 
     return html_extracting.find_newsid(url)
 
 
 def get_news(news_url):
+    """Get a news from its url
+    
+    Args:
+        url (str): news' url
+
+    Returns:
+        dict: a dictionary store many attrubites of the news in key-value
+
+    """
+
+    return html_extracting.find_newsid(url)
     news = {}
 
     try:
@@ -94,9 +157,20 @@ def get_news(news_url):
     return news
 
 
-#  Following function will query data from database
-# --------------------------
 def get_news_fromDB(module, start=1, num=-1):
+    """Query data from database
+
+    When querying news from DB, the news will be return according to the order of update time, which means the start 1 is the newest news
+
+    Args:
+        module (int): find news from which module
+        start (int): the start index in DB
+        num (int): how many news want to get
+
+    Returns:
+        list: a list of news, every news is a dictionary
+
+    """
 
     patterns = ['\r', '\n', '\t', 'NULL']
     newslist = db_module.get_news(module, start, num)
