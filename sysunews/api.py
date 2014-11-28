@@ -179,5 +179,6 @@ def get_news_fromDB(module, start=1, num=-1):
         news["maindiv"] = re.sub(u'阅读次数：<script.*?/script>', u'阅读次数：' + str(news["visit_times"]), news["maindiv"])
         news["maindiv"] = re.sub('/home/sysunews/images', "/home/images", news["maindiv"])
         news["maindiv"] = re.sub('(?<!home)/images', "/home/images", news["maindiv"])
+        news["maindiv"] = re.sub('src/.*?images', "src=\"/home/images", news["maindiv"])
 
     return newslist
