@@ -20,6 +20,7 @@ con = MySQLdb.connect(
 cursor = con.cursor()
 
 hostIP = os.popen('ifconfig | grep inet | grep -v inet6 | grep -v 127 | cut -d ":" -f 2 | cut -d " " -f 1').read()[:-1]
+hostIP = "222.200.180.135"
 
 def save_urls(urls):
     """Save the urls into database
@@ -118,6 +119,32 @@ def save_img(url):
             pass
 
 
+def resave_img(url):
+    """overwrite the image
+
+    Note:
+        When images was broken in local host
+        the images will be resave in directory /home/images/
+        and it will not check whether it's already exists
+
+    Args:
+        url (str): the url of the image, like [images/content/2014-11/20141124172306071544.jpg]
+
+    """
+    dirname = '/home/' + url[:url.rfind('/')]
+    filename = '/home/' + url
+
+    try:
+        print "saving image", url
+        image = open(filename, 'wb')
+        image.write(urllib.urlopen('http://news2.sysu.edu.cn/' + url).read())
+        image.close()
+        print "succeed"
+    except:
+        print "save img failed!"
+        pass
+
+
 def check_news(tablename, newsid):
     """Check whether the news already exist
 
@@ -188,10 +215,9 @@ def get_news(module, start, num):
             news["maindiv"] = news["maindiv"].replace(pattern, "")
 
         news["maindiv"] = re.sub(u'阅读次数：<script.*?/script>', u'阅读次数：' + str(news["visit_times"]), news["maindiv"])
-        #news["maindiv"] = re.sub('/home/sysunews/images', "/home/images", news["maindiv"])
-        #news["maindiv"] = re.sub('(?<!home)/images', "/home/images", news["maindiv"])
-        #news["maindiv"] = re.sub('../home/images', "/home/images", news["maindiv"])
-        news["maindiv"] = re.sub("(?<=src).*/images", "=\"/home/images", news["maindiv"])
+        news["maindiv"] = re.sub('/home/sysunews/images', "/home/images", news["maindiv"])
+        news["maindiv"] = re.sub('(?<!home)/images', "/home/images", news["maindiv"])
+        news["maindiv"] = re.sub('../home/images', "/home/images", news["maindiv"])
 
     return result
 
