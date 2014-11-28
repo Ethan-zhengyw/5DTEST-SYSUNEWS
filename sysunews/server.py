@@ -8,6 +8,8 @@ import web
 import json
 import thread
 import time
+import os
+import os.path
 
 import api
 import db_update
@@ -22,6 +24,7 @@ urls = (
 )
 
 app = web.application(urls, globals())
+hostIP = os.popen('ifconfig | grep inet | grep -v inet6 | grep -v 127 | cut -d ":" -f 2 | cut -d " " -f 1').read()[:-1]
 
 class GetnewsNum:
     """Class to solve url /able
@@ -136,9 +139,15 @@ class Images:
             f = open(url, 'r')
             image = f.read()
             f.close()
-            return image
         except:
-            return '' # you can send an 404 error here if you want
+
+            db_module.resave_img(url[5:])
+
+            f = open(url, 'r')
+            image = f.read()
+            f.close()
+
+        return image
 
 
 # update news every x minutes
