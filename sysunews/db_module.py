@@ -2,9 +2,11 @@
 """Module to process database
 """
 import os
+import re
 import os.path
 import urllib
 import MySQLdb
+
 import api
 
 con = MySQLdb.connect(
@@ -159,18 +161,6 @@ def get_news(module, start, num):
         list: a list of news, every news is a dictionary
 
     """
-    patterns = ['\r', '\n', '\t', 'NULL']
-    newslist = db_module.get_news(module, start, num)
-    for news in newslist:
-        for pattern in patterns:
-            news["maindiv"] = news["maindiv"].replace(pattern, "")
-
-        news["maindiv"] = re.sub(u'阅读次数：<script.*?/script>', u'阅读次数：' + str(news["visit_times"]), news["maindiv"])
-        news["maindiv"] = re.sub('/home/sysunews/images', "/home/images", news["maindiv"])
-        news["maindiv"] = re.sub('(?<!home)/images', "/home/images", news["maindiv"])
-
-    return newslist
-
     patterns = ["newsid", "module", "visit_times", "date", "url", "imgs", "author", "editor", "h1", "h2", "source", "maindiv"]
     result = []
 
@@ -190,6 +180,18 @@ def get_news(module, start, num):
             count = count + 1
 
         result.append(news)
+
+    patterns = ['\r', '\n', '\t', 'NULL']
+
+    for news in result:
+        for pattern in patterns:
+            news["maindiv"] = news["maindiv"].replace(pattern, "")
+
+        news["maindiv"] = re.sub(u'阅读次数：<script.*?/script>', u'阅读次数：' + str(news["visit_times"]), news["maindiv"])
+        #news["maindiv"] = re.sub('/home/sysunews/images', "/home/images", news["maindiv"])
+        #news["maindiv"] = re.sub('(?<!home)/images', "/home/images", news["maindiv"])
+        #news["maindiv"] = re.sub('../home/images', "/home/images", news["maindiv"])
+        news["maindiv"] = re.sub("(?<=src).*/images", "=\"/home/images", news["maindiv"])
 
     return result
 

@@ -132,8 +132,6 @@ def get_news(news_url):
         dict: a dictionary store many attrubites of the news in key-value
 
     """
-
-    return html_extracting.find_newsid(url)
     news = {}
 
     try:
