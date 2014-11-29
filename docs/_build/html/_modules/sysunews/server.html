@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sysunews.server &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sysunews.server</h1><div class="highlight"><pre>
+<span class="c">#-*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;server module</span>
+
+<span class="sd">This module help to run a server program to solve HTTP get request from client base on webpy framwork</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">web</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">thread</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">import</span> <span class="nn">api</span>
+<span class="kn">import</span> <span class="nn">db_update</span>
+<span class="kn">import</span> <span class="nn">db_module</span>
+
+<span class="c"># urls mapping</span>
+<span class="n">urls</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s">&#39;/news&#39;</span><span class="p">,</span> <span class="s">&#39;Getnews&#39;</span><span class="p">,</span>
+    <span class="s">&#39;/newshtml&#39;</span><span class="p">,</span> <span class="s">&#39;Getnews_html&#39;</span><span class="p">,</span>
+    <span class="s">&#39;/able&#39;</span><span class="p">,</span> <span class="s">&#39;GetnewsNum&#39;</span><span class="p">,</span>
+    <span class="s">&#39;(/home/images/.*)&#39;</span><span class="p">,</span> <span class="s">&#39;Images&#39;</span>
+<span class="p">)</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">application</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="nb">globals</span><span class="p">())</span>
+<span class="n">hostIP</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="s">&#39;ifconfig | grep inet | grep -v inet6 | grep -v 127 | cut -d &quot;:&quot; -f 2 | cut -d &quot; &quot; -f 1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<div class="viewcode-block" id="GetnewsNum"><a class="viewcode-back" href="../../sysunews.html#sysunews.server.GetnewsNum">[docs]</a><span class="k">class</span> <span class="nc">GetnewsNum</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class to solve url /able</span>
+
+<span class="sd">    Request url must contains a parameter</span>
+<span class="sd">        /able?module=1</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="GetnewsNum.GET"><a class="viewcode-back" href="../../sysunews.html#sysunews.server.GetnewsNum.GET">[docs]</a>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;get the num of news is certain module</span>
+
+<span class="sd">        :returns: (json) `key` - count &amp; `value` - the number of news of certain module in database::</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&quot;Content-Type&quot;</span><span class="p">,</span><span class="s">&quot;application/json; charset=utf-8&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="s">&quot;module&quot;</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;module&quot;</span><span class="p">]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">db_module</span><span class="o">.</span><span class="n">get_module_newsNum</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&quot;count&quot;</span><span class="p">:</span> <span class="n">count</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">result</span>
+</div></div>
+<div class="viewcode-block" id="Getnews"><a class="viewcode-back" href="../../sysunews.html#sysunews.server.Getnews">[docs]</a><span class="k">class</span> <span class="nc">Getnews</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class to solve url /news</span>
+<span class="sd">    </span>
+<span class="sd">    Can solve url with three parameters</span>
+<span class="sd">        /news?module=1&amp;start=1&amp;num=1</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Getnews.GET"><a class="viewcode-back" href="../../sysunews.html#sysunews.server.Getnews.GET">[docs]</a>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get news as json object</span>
+
+<span class="sd">        :returns: `newslist` - a list of news in json type</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&quot;Content-Type&quot;</span><span class="p">,</span><span class="s">&quot;application/json; charset=utf-8&quot;</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="s">&quot;module&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s">&quot;start&quot;</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="s">&quot;num&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;type&quot;</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;module&quot;</span><span class="p">]</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;start&quot;</span><span class="p">]</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;num&quot;</span><span class="p">]</span>
+        <span class="n">type_</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;type&quot;</span><span class="p">]</span>
+
+        <span class="n">module</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">module</span> <span class="o">==</span> <span class="s">&quot;module&quot;</span> <span class="k">else</span> <span class="n">module</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="s">&quot;start&quot;</span> <span class="k">else</span> <span class="n">start</span><span class="p">)</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="s">&quot;num&quot;</span> <span class="k">else</span> <span class="n">num</span><span class="p">)</span>
+
+        <span class="n">news</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_news_fromDB</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">module</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">num</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">type_</span> <span class="o">!=</span> <span class="s">&quot;html&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">news</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&quot;Content-Type&quot;</span><span class="p">,</span><span class="s">&quot;text/html; charset=utf-8&quot;</span><span class="p">)</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">news</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">=</span> <span class="n">html</span> <span class="o">+</span> <span class="n">item</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">html</span>
+
+
+</div></div>
+<div class="viewcode-block" id="Getnews_html"><a class="viewcode-back" href="../../sysunews.html#sysunews.server.Getnews_html">[docs]</a><span class="k">class</span> <span class="nc">Getnews_html</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class to solve url /news</span>
+<span class="sd">    </span>
+<span class="sd">    Can solve url with three parameters::</span>
+<span class="sd">        /news?module=1&amp;start=1&amp;num=1</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Getnews_html.GET"><a class="viewcode-back" href="../../sysunews.html#sysunews.server.Getnews_html.GET">[docs]</a>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;get html content of news</span>
+<span class="sd">        </span>
+<span class="sd">        :returns: `htmltext` - html contents of news that being request, can display in a pretty way in browser</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&quot;Content-Type&quot;</span><span class="p">,</span><span class="s">&quot;text/html; charset=utf-8&quot;</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="s">&quot;module&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s">&quot;start&quot;</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="s">&quot;num&quot;</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;module&quot;</span><span class="p">]</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;start&quot;</span><span class="p">]</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;num&quot;</span><span class="p">]</span>
+
+        <span class="n">module</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">module</span> <span class="o">==</span> <span class="s">&quot;module&quot;</span> <span class="k">else</span> <span class="n">module</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="s">&quot;start&quot;</span> <span class="k">else</span> <span class="n">start</span><span class="p">)</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="s">&quot;num&quot;</span> <span class="k">else</span> <span class="n">num</span><span class="p">)</span>
+
+        <span class="n">news</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_news_fromDB</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">module</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">num</span><span class="p">))</span>
+
+        <span class="c">#return news[0][&quot;maindiv&quot;]</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">news</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="n">html</span> <span class="o">+</span> <span class="n">item</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">html</span>
+
+</div></div>
+<div class="viewcode-block" id="Images"><a class="viewcode-back" href="../../sysunews.html#sysunews.server.Images">[docs]</a><span class="k">class</span> <span class="nc">Images</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Handler that solve url /home/images/*</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Images.GET"><a class="viewcode-back" href="../../sysunews.html#sysunews.server.Images.GET">[docs]</a>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a images with a url</span>
+
+<span class="sd">        the url is the path to a images that has been saved in local directory /home/images/</span>
+
+<span class="sd">        :param url: image url like [/home/images/content/...]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+
+            <span class="n">db_module</span><span class="o">.</span><span class="n">resave_img</span><span class="p">(</span><span class="n">url</span><span class="p">[</span><span class="mi">5</span><span class="p">:])</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">image</span>
+
+
+<span class="c"># update news every x minutes</span></div></div>
+<div class="viewcode-block" id="update_news_intime"><a class="viewcode-back" href="../../sysunews.html#sysunews.server.update_news_intime">[docs]</a><span class="k">def</span> <span class="nf">update_news_intime</span><span class="p">(</span><span class="n">minutes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;update the news database</span>
+<span class="sd">    </span>
+<span class="sd">    :param minutes: update the database every 10 minutes when minutes = 10</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">db_update</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="n">minutes</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">thread</span><span class="o">.</span><span class="n">start_new_thread</span><span class="p">(</span><span class="n">update_news_intime</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="p">,))</span> <span class="c"># start a thread to update the database every 10 minutes</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span> <span class="c"># start the web server</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Yiwang ZHENG.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

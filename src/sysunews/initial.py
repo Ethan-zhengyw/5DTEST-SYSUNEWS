@@ -1,12 +1,14 @@
 """initialize the database
 
+::
 When it's the first time to deploy this server program, please enter directory sysunews/,
-and run this follow two commands
+and run this follow two commands::
 
     mysql -u root -p
     source db_initial.sql
 
-after this two commands, a database sysunewsDB with two table (urls & news) will have been created in your mysql, and then execute
+::
+after this two commands, a database sysunewsDB with two table (urls & news) will have been created in your mysql, and then execute::
 
     python initial.py
 
@@ -19,4 +21,4 @@ import time
 import sysunews.api as api
 import sysunews.db_update as db_update
 
-db_update.initial()
+#db_update.initial()

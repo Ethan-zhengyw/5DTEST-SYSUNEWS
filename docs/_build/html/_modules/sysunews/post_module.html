@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sysunews.post_module &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sysunews.post_module</h1><div class="highlight"><pre>
+<span class="c">#-*-encoding: utf-8-*-</span>
+<span class="sd">&quot;&quot;&quot;Main Request object</span>
+
+<span class="sd">This file contains some definition of Request object to be used in api to get the content of certain website page</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">urllib2</span>
+
+<span class="c"># Request header</span>
+<span class="n">header</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s">&quot;Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; InfoPath.3; .NET4.0E; Shuame)&quot;</span>
+<span class="p">}</span>
+
+<div class="viewcode-block" id="req_get_news_urls"><a class="viewcode-back" href="../../sysunews.html#sysunews.post_module.req_get_news_urls">[docs]</a><span class="k">def</span> <span class="nf">req_get_news_urls</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;get a request object</span>
+
+<span class="sd">    :param module: 1  - 中大新闻 2  - 每周聚焦 3  - 媒体中大</span>
+<span class="sd">    :param index: certain page of a module</span>
+<span class="sd">    :returns: `Request` - a Request object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">module_url</span> <span class="o">=</span> <span class="s">&#39;http://news2.sysu.edu.cn/news0&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;/index&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;.htm&#39;</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">module_url</span><span class="p">,</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">header</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">req</span>
+
+</div>
+<div class="viewcode-block" id="req_easy_req"><a class="viewcode-back" href="../../sysunews.html#sysunews.post_module.req_easy_req">[docs]</a><span class="k">def</span> <span class="nf">req_easy_req</span><span class="p">(</span><span class="n">address</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;get a simple request object </span>
+
+<span class="sd">    :param address: the url to open</span>
+<span class="sd">    :returns: `Request` - a Request object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">address</span><span class="p">,</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">header</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">req</span>
+
+</div>
+<div class="viewcode-block" id="req_get_news"><a class="viewcode-back" href="../../sysunews.html#sysunews.post_module.req_get_news">[docs]</a><span class="k">def</span> <span class="nf">req_get_news</span><span class="p">(</span><span class="n">news_url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;get a Request object</span>
+
+<span class="sd">    :param news_url: an url of a news like: [http://news2.sysu.edu.cn/news01/141185.htm]</span>
+<span class="sd">    :returns: `Request` - a Request object to open a news url</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">req_easy_req</span><span class="p">(</span><span class="n">news_url</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Yiwang ZHENG.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

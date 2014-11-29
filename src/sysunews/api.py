@@ -24,14 +24,13 @@ opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
 def get_index_range(data):
     """find the index range
 
-    Args:
-        data (str): content of [http://news2.sysu.edu.cn/news0*/index.htm]
+    :param data: content of [http://news2.sysu.edu.cn/news0*/index.htm]
 
-    Returns:
-        start, end: two integer, corresponding to the start and the end of index
+    :returns:
+        - `start`: an integer, corresponding to the start of index
+        - `end`: an integer, corresponding to the end of index
 
     """
-
     return html_extracting.find_index_range(data)
 
 
@@ -41,11 +40,8 @@ def get_newsid_firstpage(module):
     get the newsid in the first page of three module 
     in order to check whether some new news has been post
 
-    Args:
-        module (int): module to get, range form 1 to 3
-
-    Returns:
-        a list of newsid
+    :param module: module to get, range form 1 to 3
+    :returns: `newsids` - a list of newsid will be returned
 
     """
     newsids = []
@@ -65,11 +61,8 @@ def get_newsid_firstpage(module):
 def get_news_urls(module):
     """Get all urls of certain module
     
-    Args:
-        module (int): urls of which module to get
-
-    Returns:
-        a list of urls
+    :param module: urls of which module to get
+    :returns: urls - a list of urls
 
     """
     urls = []
@@ -97,11 +90,8 @@ def get_news_urls(module):
 def get_module(url):
     """Get the module id of a news from its url
     
-    Args:
-        url (str): news' url
-
-    Returns:
-        str: the module id
+    :param url: news' url
+    :returns: module - the module id
 
     """
 
@@ -111,11 +101,8 @@ def get_module(url):
 def get_newsid(url):
     """Get the newsid of a news from its url
     
-    Args:
-        url (str): news' url
-
-    Returns:
-        str: the newsid
+    :param url: news' url
+    :returns: newsid - str of the newsid
 
     """
 
@@ -125,11 +112,8 @@ def get_newsid(url):
 def get_news(news_url):
     """Get a news from its url
     
-    Args:
-        url (str): news' url
-
-    Returns:
-        dict: a dictionary store many attrubites of the news in key-value
+    :param url: news' url
+    :returns: news - a dictionary store many attrubites of the news in key-value
 
     """
     news = {}
@@ -160,13 +144,10 @@ def get_news_fromDB(module, start=1, num=-1):
 
     When querying news from DB, the news will be return according to the order of update time, which means the start 1 is the newest news
 
-    Args:
-        module (int): find news from which module
-        start (int): the start index in DB
-        num (int): how many news want to get
-
-    Returns:
-        list: a list of news, every news is a dictionary
+    :param module: an integer to point out from which module to find news
+    :param start: the start index in DB, 1 means the newest one
+    :param num: how many news want to get
+    :returns: list - a list of news, every news is a dictionary
 
     """
 

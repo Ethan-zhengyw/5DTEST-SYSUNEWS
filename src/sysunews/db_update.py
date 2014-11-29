@@ -1,18 +1,23 @@
 #-*-encoding: utf-8-*-
 import urllib2
-import api
-import db_module
 import errno
 
-diction = {1: "中大新闻", 2: "每周聚焦", 3: "媒体中大"}
+import api
+import db_module
+
+diction = {
+    1: "中大新闻",
+    2: "每周聚焦",
+    3: "媒体中大"
+}
+
 def initial():
     """Initialize the database
 
+    ::
     This function will get all possible news url from the website and save them into database when it's not exist
-    
-    Note:
-        Should be call by user::
-            sudo python db_initial.py
+    Should be call by user when it's first time to setup::
+        sudo python db_initial.py
 
     """
     modules = [3, 2, 1]

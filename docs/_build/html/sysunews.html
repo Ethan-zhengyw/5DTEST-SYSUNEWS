@@ -1,0 +1,682 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sysunews package &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="index.html" />
+    <link rel="prev" title="Welcome to SYSUNEWS’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to SYSUNEWS’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">src  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="sysunews-package">
+<h1>sysunews package<a class="headerlink" href="#sysunews-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sysunews.api">
+<span id="sysunews-api-module"></span><h2>sysunews.api module<a class="headerlink" href="#module-sysunews.api" title="Permalink to this headline">¶</a></h2>
+<p>api module, call by db_update module mainly</p>
+<p>Function in this module mainly call function in html_extracting module to finish their job.</p>
+<dl class="function">
+<dt id="sysunews.api.get_index_range">
+<tt class="descclassname">sysunews.api.</tt><tt class="descname">get_index_range</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/sysunews/api.html#get_index_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.api.get_index_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>find the index range</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> &#8211; content of [<a class="reference external" href="http://news2.sysu.edu.cn/news0*/index.htm">http://news2.sysu.edu.cn/news0*/index.htm</a>]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><cite>start</cite>: an integer, corresponding to the start of index</li>
+<li><cite>end</cite>: an integer, corresponding to the end of index</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.api.get_module">
+<tt class="descclassname">sysunews.api.</tt><tt class="descname">get_module</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/sysunews/api.html#get_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.api.get_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the module id of a news from its url</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> &#8211; news&#8217; url</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">module - the module id</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.api.get_news">
+<tt class="descclassname">sysunews.api.</tt><tt class="descname">get_news</tt><big>(</big><em>news_url</em><big>)</big><a class="reference internal" href="_modules/sysunews/api.html#get_news"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.api.get_news" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a news from its url</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> &#8211; news&#8217; url</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">news - a dictionary store many attrubites of the news in key-value</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.api.get_news_fromDB">
+<tt class="descclassname">sysunews.api.</tt><tt class="descname">get_news_fromDB</tt><big>(</big><em>module</em>, <em>start=1</em>, <em>num=-1</em><big>)</big><a class="reference internal" href="_modules/sysunews/api.html#get_news_fromDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.api.get_news_fromDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query data from database</p>
+<p>When querying news from DB, the news will be return according to the order of update time, which means the start 1 is the newest news</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>module</strong> &#8211; an integer to point out from which module to find news</li>
+<li><strong>start</strong> &#8211; the start index in DB, 1 means the newest one</li>
+<li><strong>num</strong> &#8211; how many news want to get</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list - a list of news, every news is a dictionary</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.api.get_news_urls">
+<tt class="descclassname">sysunews.api.</tt><tt class="descname">get_news_urls</tt><big>(</big><em>module</em><big>)</big><a class="reference internal" href="_modules/sysunews/api.html#get_news_urls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.api.get_news_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all urls of certain module</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>module</strong> &#8211; urls of which module to get</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">urls - a list of urls</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.api.get_newsid">
+<tt class="descclassname">sysunews.api.</tt><tt class="descname">get_newsid</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/sysunews/api.html#get_newsid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.api.get_newsid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the newsid of a news from its url</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> &#8211; news&#8217; url</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">newsid - str of the newsid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.api.get_newsid_firstpage">
+<tt class="descclassname">sysunews.api.</tt><tt class="descname">get_newsid_firstpage</tt><big>(</big><em>module</em><big>)</big><a class="reference internal" href="_modules/sysunews/api.html#get_newsid_firstpage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.api.get_newsid_firstpage" title="Permalink to this definition">¶</a></dt>
+<dd><p>find the newsid</p>
+<p>get the newsid in the first page of three module 
+in order to check whether some new news has been post</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>module</strong> &#8211; module to get, range form 1 to 3</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><cite>newsids</cite> - a list of newsid will be returned</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sysunews.db_module">
+<span id="sysunews-db-module-module"></span><h2>sysunews.db_module module<a class="headerlink" href="#module-sysunews.db_module" title="Permalink to this headline">¶</a></h2>
+<p>Module to process database</p>
+<dl class="function">
+<dt id="sysunews.db_module.check_news">
+<tt class="descclassname">sysunews.db_module.</tt><tt class="descname">check_news</tt><big>(</big><em>newsid</em><big>)</big><a class="reference internal" href="_modules/sysunews/db_module.html#check_news"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.db_module.check_news" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether the news already exist in table urls</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tablename</strong> &#8211; check the news in which table</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">return <cite>True</cite> if find new with the same newsid in table urls else return <cite>False</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.db_module.cleandb">
+<tt class="descclassname">sysunews.db_module.</tt><tt class="descname">cleandb</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sysunews/db_module.html#cleandb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.db_module.cleandb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean the database</p>
+<p>This fuction will delete two table: urls and news in sysunewsDB</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.db_module.get_module_newsNum">
+<tt class="descclassname">sysunews.db_module.</tt><tt class="descname">get_module_newsNum</tt><big>(</big><em>module</em><big>)</big><a class="reference internal" href="_modules/sysunews/db_module.html#get_module_newsNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.db_module.get_module_newsNum" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the num of news is certain module</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>module</strong> &#8211; find news number of which module</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><cite>int</cite> - the number of news of certain module in database</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.db_module.get_news">
+<tt class="descclassname">sysunews.db_module.</tt><tt class="descname">get_news</tt><big>(</big><em>module</em>, <em>start</em>, <em>num</em><big>)</big><a class="reference internal" href="_modules/sysunews/db_module.html#get_news"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.db_module.get_news" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query data from database</p>
+<p>When querying news from DB, the news will be return according to the order of update time, which means the start 1 is the newest news</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>module</strong> &#8211; find news from which module</li>
+<li><strong>start</strong> &#8211; the start index in DB</li>
+<li><strong>num</strong> &#8211; how many news want to get</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><cite>result</cite> - a list of news, every news is a dictionary</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.db_module.resave_img">
+<tt class="descclassname">sysunews.db_module.</tt><tt class="descname">resave_img</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/sysunews/db_module.html#resave_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.db_module.resave_img" title="Permalink to this definition">¶</a></dt>
+<dd><p>overwrite the image</p>
+<p>When images was broken in local host, the images will be resave in directory /home/images/, and it will not check whether it&#8217;s already exists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> &#8211; the url of the image, like [images/content/2014-11/20141124172306071544.jpg]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.db_module.save_img">
+<tt class="descclassname">sysunews.db_module.</tt><tt class="descname">save_img</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/sysunews/db_module.html#save_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.db_module.save_img" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the image</p>
+<p>The images will be save in directory /home/images/, and it will check whether it&#8217;s already exists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> &#8211; the url of the image, like [images/content/2014-11/20141124172306071544.jpg]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.db_module.save_news">
+<tt class="descclassname">sysunews.db_module.</tt><tt class="descname">save_news</tt><big>(</big><em>news</em><big>)</big><a class="reference internal" href="_modules/sysunews/db_module.html#save_news"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.db_module.save_news" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save news into database</p>
+<p>Will check whether the news is already in database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>news</strong> &#8211; a news dictionary</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.db_module.save_urls">
+<tt class="descclassname">sysunews.db_module.</tt><tt class="descname">save_urls</tt><big>(</big><em>urls</em><big>)</big><a class="reference internal" href="_modules/sysunews/db_module.html#save_urls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.db_module.save_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the urls into database</p>
+<p>When url is already in database, it will just ignore it quietly</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>urls</strong> &#8211; url list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sysunews.db_update">
+<span id="sysunews-db-update-module"></span><h2>sysunews.db_update module<a class="headerlink" href="#module-sysunews.db_update" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sysunews.db_update.initial">
+<tt class="descclassname">sysunews.db_update.</tt><tt class="descname">initial</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sysunews/db_update.html#initial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.db_update.initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the database</p>
+<p>::
+This function will get all possible news url from the website and save them into database when it&#8217;s not exist
+Should be call by user when it&#8217;s first time to setup:</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo python db_initial.py
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.db_update.update">
+<tt class="descclassname">sysunews.db_update.</tt><tt class="descname">update</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sysunews/db_update.html#update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.db_update.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>update the database</p>
+<p>This function will be use in server.py to check whether there is new news post into the website every 10 minutes and save new news into database,</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sysunews.html_extracting">
+<span id="sysunews-html-extracting-module"></span><h2>sysunews.html_extracting module<a class="headerlink" href="#module-sysunews.html_extracting" title="Permalink to this headline">¶</a></h2>
+<p>HTML content processing</p>
+<p>This file is the module to processing html content, using regular expression module to match the target content and return them to function in api mainly.</p>
+<dl class="function">
+<dt id="sysunews.html_extracting.find_index_range">
+<tt class="descclassname">sysunews.html_extracting.</tt><tt class="descname">find_index_range</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/sysunews/html_extracting.html#find_index_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.html_extracting.find_index_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>find the index range</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> &#8211; content of [<a class="reference external" href="http://news2.sysu.edu.cn/news0*/index.htm">http://news2.sysu.edu.cn/news0*/index.htm</a>]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><cite>start</cite>: an integer, corresponding to the start of index</li>
+<li><cite>end</cite>: an integer, corresponding to the end of index</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.html_extracting.find_module">
+<tt class="descclassname">sysunews.html_extracting.</tt><tt class="descname">find_module</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/sysunews/html_extracting.html#find_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.html_extracting.find_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the module id of a news from its url</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> &#8211; news&#8217; url</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><cite>module</cite> - the module id of the news in url</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.html_extracting.find_news">
+<tt class="descclassname">sysunews.html_extracting.</tt><tt class="descname">find_news</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/sysunews/html_extracting.html#find_news"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.html_extracting.find_news" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracting the news attributes from data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> &#8211; the conten of a news html page</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><cite>news</cite> - return a structed news</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.html_extracting.find_news_urls">
+<tt class="descclassname">sysunews.html_extracting.</tt><tt class="descname">find_news_urls</tt><big>(</big><em>data</em>, <em>module</em><big>)</big><a class="reference internal" href="_modules/sysunews/html_extracting.html#find_news_urls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.html_extracting.find_news_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find news url in data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> &#8211; content of a page ex.[<a class="reference external" href="http://news2.sysu.edu.cn/news01/index1.htm">http://news2.sysu.edu.cn/news01/index1.htm</a>]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><cite>list</cite> - a url list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.html_extracting.find_newsid">
+<tt class="descclassname">sysunews.html_extracting.</tt><tt class="descname">find_newsid</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/sysunews/html_extracting.html#find_newsid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.html_extracting.find_newsid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the newsid of a news from its url</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> &#8211; news&#8217; url</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><cite>newsid</cite> - the newsid of the news in url</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sysunews.initial">
+<span id="sysunews-initial-module"></span><h2>sysunews.initial module<a class="headerlink" href="#module-sysunews.initial" title="Permalink to this headline">¶</a></h2>
+<p>initialize the database</p>
+<p>::
+When it&#8217;s the first time to deploy this server program, please enter directory sysunews/,
+and run this follow two commands:</p>
+<div class="highlight-python"><div class="highlight"><pre>mysql -u root -p
+source db_initial.sql
+</pre></div>
+</div>
+<p>::
+after this two commands, a database sysunewsDB with two table (urls &amp; news) will have been created in your mysql, and then execute:</p>
+<div class="highlight-python"><div class="highlight"><pre>python initial.py
+</pre></div>
+</div>
+<p>This will crawl news from news.sysu.edu.cn and save them into the database created before</p>
+</div>
+<div class="section" id="module-sysunews.post_module">
+<span id="sysunews-post-module-module"></span><h2>sysunews.post_module module<a class="headerlink" href="#module-sysunews.post_module" title="Permalink to this headline">¶</a></h2>
+<p>Main Request object</p>
+<p>This file contains some definition of Request object to be used in api to get the content of certain website page</p>
+<dl class="function">
+<dt id="sysunews.post_module.req_easy_req">
+<tt class="descclassname">sysunews.post_module.</tt><tt class="descname">req_easy_req</tt><big>(</big><em>address</em><big>)</big><a class="reference internal" href="_modules/sysunews/post_module.html#req_easy_req"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.post_module.req_easy_req" title="Permalink to this definition">¶</a></dt>
+<dd><p>get a simple request object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>address</strong> &#8211; the url to open</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><cite>Request</cite> - a Request object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.post_module.req_get_news">
+<tt class="descclassname">sysunews.post_module.</tt><tt class="descname">req_get_news</tt><big>(</big><em>news_url</em><big>)</big><a class="reference internal" href="_modules/sysunews/post_module.html#req_get_news"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.post_module.req_get_news" title="Permalink to this definition">¶</a></dt>
+<dd><p>get a Request object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>news_url</strong> &#8211; an url of a news like: [<a class="reference external" href="http://news2.sysu.edu.cn/news01/141185.htm">http://news2.sysu.edu.cn/news01/141185.htm</a>]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><cite>Request</cite> - a Request object to open a news url</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.post_module.req_get_news_urls">
+<tt class="descclassname">sysunews.post_module.</tt><tt class="descname">req_get_news_urls</tt><big>(</big><em>module</em>, <em>index=''</em><big>)</big><a class="reference internal" href="_modules/sysunews/post_module.html#req_get_news_urls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.post_module.req_get_news_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>get a request object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>module</strong> &#8211; 1  - 中大新闻 2  - 每周聚焦 3  - 媒体中大</li>
+<li><strong>index</strong> &#8211; certain page of a module</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><cite>Request</cite> - a Request object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sysunews.server">
+<span id="sysunews-server-module"></span><h2>sysunews.server module<a class="headerlink" href="#module-sysunews.server" title="Permalink to this headline">¶</a></h2>
+<p>server module</p>
+<p>This module help to run a server program to solve HTTP get request from client base on webpy framwork</p>
+<dl class="class">
+<dt id="sysunews.server.Getnews">
+<em class="property">class </em><tt class="descclassname">sysunews.server.</tt><tt class="descname">Getnews</tt><a class="reference internal" href="_modules/sysunews/server.html#Getnews"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.server.Getnews" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to solve url /news</p>
+<dl class="docutils">
+<dt>Can solve url with three parameters</dt>
+<dd>/news?module=1&amp;start=1&amp;num=1</dd>
+</dl>
+<dl class="method">
+<dt id="sysunews.server.Getnews.GET">
+<tt class="descname">GET</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sysunews/server.html#Getnews.GET"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.server.Getnews.GET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get news as json object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><cite>newslist</cite> - a list of news in json type</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sysunews.server.GetnewsNum">
+<em class="property">class </em><tt class="descclassname">sysunews.server.</tt><tt class="descname">GetnewsNum</tt><a class="reference internal" href="_modules/sysunews/server.html#GetnewsNum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.server.GetnewsNum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to solve url /able</p>
+<dl class="docutils">
+<dt>Request url must contains a parameter</dt>
+<dd>/able?module=1</dd>
+</dl>
+<dl class="method">
+<dt id="sysunews.server.GetnewsNum.GET">
+<tt class="descname">GET</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sysunews/server.html#GetnewsNum.GET"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.server.GetnewsNum.GET" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the num of news is certain module</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">(json) <cite>key</cite> - count &amp; <cite>value</cite> - the number of news of certain module in database:</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sysunews.server.Getnews_html">
+<em class="property">class </em><tt class="descclassname">sysunews.server.</tt><tt class="descname">Getnews_html</tt><a class="reference internal" href="_modules/sysunews/server.html#Getnews_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.server.Getnews_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to solve url /news</p>
+<dl class="docutils">
+<dt>Can solve url with three parameters::</dt>
+<dd>/news?module=1&amp;start=1&amp;num=1</dd>
+</dl>
+<dl class="method">
+<dt id="sysunews.server.Getnews_html.GET">
+<tt class="descname">GET</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/sysunews/server.html#Getnews_html.GET"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.server.Getnews_html.GET" title="Permalink to this definition">¶</a></dt>
+<dd><p>get html content of news</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><cite>htmltext</cite> - html contents of news that being request, can display in a pretty way in browser</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sysunews.server.Images">
+<em class="property">class </em><tt class="descclassname">sysunews.server.</tt><tt class="descname">Images</tt><a class="reference internal" href="_modules/sysunews/server.html#Images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.server.Images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler that solve url /home/images/*</p>
+<dl class="method">
+<dt id="sysunews.server.Images.GET">
+<tt class="descname">GET</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/sysunews/server.html#Images.GET"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.server.Images.GET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a images with a url</p>
+<p>the url is the path to a images that has been saved in local directory /home/images/</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>url</strong> &#8211; image url like [/home/images/content/...]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="sysunews.server.update_news_intime">
+<tt class="descclassname">sysunews.server.</tt><tt class="descname">update_news_intime</tt><big>(</big><em>minutes</em><big>)</big><a class="reference internal" href="_modules/sysunews/server.html#update_news_intime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sysunews.server.update_news_intime" title="Permalink to this definition">¶</a></dt>
+<dd><p>update the news database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>minutes</strong> &#8211; update the database every 10 minutes when minutes = 10</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sysunews">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sysunews" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">sysunews package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-sysunews.api">sysunews.api module</a></li>
+<li><a class="reference internal" href="#module-sysunews.db_module">sysunews.db_module module</a></li>
+<li><a class="reference internal" href="#module-sysunews.db_update">sysunews.db_update module</a></li>
+<li><a class="reference internal" href="#module-sysunews.html_extracting">sysunews.html_extracting module</a></li>
+<li><a class="reference internal" href="#module-sysunews.initial">sysunews.initial module</a></li>
+<li><a class="reference internal" href="#module-sysunews.post_module">sysunews.post_module module</a></li>
+<li><a class="reference internal" href="#module-sysunews.server">sysunews.server module</a></li>
+<li><a class="reference internal" href="#module-sysunews">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to SYSUNEWS&#8217;s documentation!</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/sysunews.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to SYSUNEWS’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">src  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Yiwang ZHENG.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -29,18 +29,14 @@ hostIP = os.popen('ifconfig | grep inet | grep -v inet6 | grep -v 127 | cut -d "
 class GetnewsNum:
     """Class to solve url /able
 
-    Request url must contains a parameter::
+    Request url must contains a parameter
         /able?module=1
 
     """
     def GET(self):
         """get the num of news is certain module
 
-        Returns:
-            json: key - count & value - the number of news of certain module in database::
-                {
-                    "count": 1000
-                }
+        :returns: (json) `key` - count & `value` - the number of news of certain module in database::
 
         """
         web.header("Content-Type","application/json; charset=utf-8")
@@ -53,14 +49,14 @@ class GetnewsNum:
 class Getnews:
     """Class to solve url /news
     
-    Can solve url with three parameters::
+    Can solve url with three parameters
         /news?module=1&start=1&num=1
 
     """
     def GET(self):
         """Get news as json object
 
-        Will return a list of news in json type
+        :returns: `newslist` - a list of news in json type
 
         """
         web.header("Content-Type","application/json; charset=utf-8")
@@ -98,7 +94,7 @@ class Getnews_html:
     def GET(self):
         """get html content of news
         
-        Will return html contents of news that being request, can display in a pretty way in browser
+        :returns: `htmltext` - html contents of news that being request, can display in a pretty way in browser
 
         """
         web.header("Content-Type","text/html; charset=utf-8")
@@ -128,11 +124,9 @@ class Images:
     def GET(self, url):
         """Get a images with a url
 
-        Note:
-            the url is the path to a images that has been saved in local directory /home/images/
+        the url is the path to a images that has been saved in local directory /home/images/
 
-        Args:
-            url (str): image url like [/home/images/content/...]
+        :param url: image url like [/home/images/content/...]
 
         """
         try:
@@ -154,15 +148,13 @@ class Images:
 def update_news_intime(minutes):
     """update the news database
     
-    Args:
-        minutes (int): update the database every 10 minutes when minutes = 10
+    :param minutes: update the database every 10 minutes when minutes = 10
 
     """
     while True:
         db_update.update()
         time.sleep(60 * minutes)
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     thread.start_new_thread(update_news_intime, (10,)) # start a thread to update the database every 10 minutes
     app.run() # start the web server

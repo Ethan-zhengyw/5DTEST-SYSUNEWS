@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sysunews.html_extracting &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sysunews.html_extracting</h1><div class="highlight"><pre>
+<span class="c">#-*-encoding: utf-8-*-</span>
+<span class="sd">&quot;&quot;&quot;HTML content processing</span>
+
+<span class="sd">This file is the module to processing html content, using regular expression module to match the target content and return them to function in api mainly.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="kn">import</span> <span class="nn">cookielib</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">post_module</span>
+
+<span class="n">cookie</span> <span class="o">=</span> <span class="n">cookielib</span><span class="o">.</span><span class="n">CookieJar</span><span class="p">()</span>
+<span class="n">opener</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">build_opener</span><span class="p">(</span><span class="n">urllib2</span><span class="o">.</span><span class="n">HTTPCookieProcessor</span><span class="p">(</span><span class="n">cookie</span><span class="p">))</span>
+
+<div class="viewcode-block" id="find_index_range"><a class="viewcode-back" href="../../sysunews.html#sysunews.html_extracting.find_index_range">[docs]</a><span class="k">def</span> <span class="nf">find_index_range</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;find the index range</span>
+
+<span class="sd">    :param data: content of [http://news2.sysu.edu.cn/news0*/index.htm]</span>
+<span class="sd">    :returns:</span>
+<span class="sd">        - `start`: an integer, corresponding to the start of index</span>
+<span class="sd">        - `end`: an integer, corresponding to the end of index</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">html_extracting</span><span class="o">.</span><span class="n">find_index_range</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="n">regexp</span> <span class="o">=</span> <span class="s">&#39;(?&lt;=href=&quot;index)(\d+)&#39;</span>
+    <span class="n">indexes</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">regexp</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="n">start</span> <span class="o">=</span> <span class="n">indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span>
+
+</div>
+<div class="viewcode-block" id="find_news_urls"><a class="viewcode-back" href="../../sysunews.html#sysunews.html_extracting.find_news_urls">[docs]</a><span class="k">def</span> <span class="nf">find_news_urls</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find news url in data</span>
+
+<span class="sd">    :param data: content of a page ex.[http://news2.sysu.edu.cn/news01/index1.htm]</span>
+<span class="sd">    :returns: `list` - a url list</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">urls</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">regexp</span> <span class="o">=</span> <span class="s">&#39;(?&lt;=&lt;/span&gt;&lt;a href=&quot;)(\d+)&#39;</span>
+    <span class="n">hrefnums</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">regexp</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">newid</span> <span class="ow">in</span> <span class="n">hrefnums</span><span class="p">:</span>
+        <span class="n">urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;http://news2.sysu.edu.cn/news0&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="n">newid</span> <span class="o">+</span> <span class="s">&#39;.htm&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">urls</span>
+
+
+<span class="c"># -----------------------------</span>
+<span class="c"># Article Store structure</span>
+<span class="c">#     {</span>
+<span class="c">#         h1, h2, source, author, editor, date, visit_times, div,</span>
+<span class="c">#         url, module,</span>
+<span class="c">#         imgs = [&quot;&quot;, &quot;&quot;, &quot;&quot;, ...],</span>
+<span class="c">#         videos [&quot;&quot;, &quot;&quot;, &quot;&quot;, ...]</span>
+<span class="c">#     }</span>
+<span class="c"># -----------------------------</span></div>
+<div class="viewcode-block" id="find_news"><a class="viewcode-back" href="../../sysunews.html#sysunews.html_extracting.find_news">[docs]</a><span class="k">def</span> <span class="nf">find_news</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extracting the news attributes from data</span>
+
+<span class="sd">    :param data: the conten of a news html page</span>
+<span class="sd">    :returns: `news` - return a structed news</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">news</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c"># find title h1 and h2</span>
+    <span class="c"># --------------------------</span>
+    <span class="n">patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;h1&quot;</span><span class="p">,</span> <span class="s">&quot;h2&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">patterns</span><span class="p">:</span>
+        <span class="n">regexp</span> <span class="o">=</span> <span class="s">&#39;(?&lt;=&lt;&#39;</span> <span class="o">+</span> <span class="n">pattern</span> <span class="o">+</span> <span class="s">&#39; align=&quot;center&quot;&gt;).*?(?=&lt;/&#39;</span> <span class="o">+</span> <span class="n">pattern</span> <span class="o">+</span> <span class="s">&#39;&gt;)&#39;</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">regexp</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">news</span><span class="p">[</span><span class="n">pattern</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+
+
+    <span class="c"># find source, author, editor and date</span>
+    <span class="c"># --------------------------</span>
+    <span class="n">patterns</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;source&quot;</span><span class="p">:</span><span class="s">&quot;稿件来源&quot;</span><span class="p">,</span> <span class="s">&quot;author&quot;</span><span class="p">:</span><span class="s">&quot;作者&quot;</span><span class="p">,</span> <span class="s">&quot;editor&quot;</span><span class="p">:</span><span class="s">&quot;编辑&quot;</span><span class="p">,</span> <span class="s">&quot;date&quot;</span><span class="p">:</span><span class="s">&quot;发布日期&quot;</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">patterns</span><span class="p">:</span>
+        <span class="n">regexp</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">[</span><span class="n">pattern</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;：(.*?)\ &#39;</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">regexp</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">news</span><span class="p">[</span><span class="n">pattern</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c"># find visit times</span>
+    <span class="c"># --------------------------</span>
+    <span class="c"># To get the read times of an article</span>
+    <span class="c"># a new request is needed</span>
+    <span class="n">regexp</span> <span class="o">=</span> <span class="s">r&#39;阅读次数：&lt;script src=&quot;(.*?)&quot;&#39;</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">regexp</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">post_module</span><span class="o">.</span><span class="n">req_easy_req</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">req</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">news</span><span class="p">[</span><span class="s">&quot;visit_times&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">r&#39;\d+&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+
+    <span class="c"># find div - article div in html</span>
+    <span class="c"># --------------------------</span>
+    <span class="n">regexp</span> <span class="o">=</span> <span class="s">&#39;(&lt;div id=&quot;mainright&quot;&gt;.*?)(&lt;div class=&quot;clear&quot;&gt;&lt;/div&gt;)&#39;</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regexp</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">S</span><span class="p">),</span> <span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">news</span><span class="p">[</span><span class="s">&quot;div&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span><span class="p">[:</span><span class="o">-</span><span class="mi">10</span><span class="p">]</span>
+    
+    <span class="c"># find images src</span>
+    <span class="c"># --------------------------</span>
+    <span class="n">imgs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">regexp</span> <span class="o">=</span> <span class="s">r&#39;&lt;img .*?src=&quot;../(.*?)&quot;&#39;</span>
+
+    <span class="n">matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">regexp</span><span class="p">,</span> <span class="n">news</span><span class="p">[</span><span class="s">&quot;div&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">matches</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
+             <span class="n">imgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+
+    <span class="n">news</span><span class="p">[</span><span class="s">&quot;imgs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imgs</span>
+    
+    <span class="n">news</span><span class="p">[</span><span class="s">&quot;div&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;&lt;img src=&quot;\.\./&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;img src=&quot;/home/sysunews/&#39;</span><span class="p">,</span> <span class="n">news</span><span class="p">[</span><span class="s">&quot;div&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">news</span>
+
+</div>
+<div class="viewcode-block" id="find_module"><a class="viewcode-back" href="../../sysunews.html#sysunews.html_extracting.find_module">[docs]</a><span class="k">def</span> <span class="nf">find_module</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the module id of a news from its url</span>
+<span class="sd">    </span>
+<span class="sd">    :param url: news&#39; url</span>
+<span class="sd">    :returns: `module` - the module id of the news in url</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;news0(\d+)&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="find_newsid"><a class="viewcode-back" href="../../sysunews.html#sysunews.html_extracting.find_newsid">[docs]</a><span class="k">def</span> <span class="nf">find_newsid</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the newsid of a news from its url</span>
+<span class="sd">    </span>
+<span class="sd">    :param url: news&#39; url</span>
+<span class="sd">    :returns: `newsid` - the newsid of the news in url</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;(\d+)\.htm&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Yiwang ZHENG.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

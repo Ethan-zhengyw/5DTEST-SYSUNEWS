@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sysunews.db_update &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sysunews.db_update</h1><div class="highlight"><pre>
+<span class="c">#-*-encoding: utf-8-*-</span>
+<span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="kn">import</span> <span class="nn">errno</span>
+
+<span class="kn">import</span> <span class="nn">api</span>
+<span class="kn">import</span> <span class="nn">db_module</span>
+
+<span class="n">diction</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="s">&quot;中大新闻&quot;</span><span class="p">,</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="s">&quot;每周聚焦&quot;</span><span class="p">,</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="s">&quot;媒体中大&quot;</span>
+<span class="p">}</span>
+
+<div class="viewcode-block" id="initial"><a class="viewcode-back" href="../../sysunews.html#sysunews.db_update.initial">[docs]</a><span class="k">def</span> <span class="nf">initial</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Initialize the database</span>
+
+<span class="sd">    ::</span>
+<span class="sd">    This function will get all possible news url from the website and save them into database when it&#39;s not exist</span>
+<span class="sd">    Should be call by user when it&#39;s first time to setup::</span>
+<span class="sd">        sudo python db_initial.py</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">urls</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ok_urls</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#url of news that have been save successfully</span>
+
+    <span class="c">#db_module.cleandb()</span>
+
+    <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot; updating module&quot;</span><span class="p">,</span> <span class="n">diction</span><span class="p">[</span><span class="n">module</span><span class="p">],</span> <span class="s">&quot;...&quot;</span>
+        <span class="n">urls</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_news_urls</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">print</span> <span class="s">&quot; saving news into sysunewsDB.news...</span><span class="se">\n</span><span class="s">+------------------------------------&quot;</span>
+        <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">db_module</span><span class="o">.</span><span class="n">check_news</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">get_newsid</span><span class="p">(</span><span class="n">url</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">news</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_news</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">news</span><span class="p">):</span>
+                    <span class="n">db_module</span><span class="o">.</span><span class="n">save_news</span><span class="p">(</span><span class="n">news</span><span class="p">)</span>
+                    <span class="n">ok_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>  <span class="c"># actually not used, save when save news!</span>
+
+            <span class="k">except</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot; failed to saving news &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">count</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">news</span><span class="p">[</span><span class="s">&quot;h1&quot;</span><span class="p">]</span>
+                <span class="k">pass</span> <span class="c"># Handle error here.</span>
+        <span class="k">print</span> <span class="s">&quot;+------------------------------------</span><span class="se">\n</span><span class="s"> Finished&quot;</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="s">&quot;new news found!</span><span class="se">\n</span><span class="s">&quot;</span>
+
+</div>
+<div class="viewcode-block" id="update"><a class="viewcode-back" href="../../sysunews.html#sysunews.db_update.update">[docs]</a><span class="k">def</span> <span class="nf">update</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;update the database</span>
+
+<span class="sd">    This function will be use in server.py to check whether there is new news post into the website every 10 minutes and save new news into database,</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">False</span> <span class="c"># new news found or not</span>
+        <span class="k">print</span> <span class="s">&quot;updating module,&quot;</span><span class="p">,</span> <span class="n">diction</span><span class="p">[</span><span class="n">module</span><span class="p">],</span> 
+        <span class="n">newsids</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_newsid_firstpage</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">newsid</span> <span class="ow">in</span> <span class="n">newsids</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;http://news2.sysu.edu.cn/news0&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">newsid</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;.htm&#39;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">db_module</span><span class="o">.</span><span class="n">check_news</span><span class="p">(</span><span class="n">newsid</span><span class="p">):</span>
+                <span class="k">print</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">new news found: &quot;</span><span class="p">,</span> <span class="n">newsid</span><span class="p">,</span>
+                <span class="n">db_module</span><span class="o">.</span><span class="n">save_news</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">get_news</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+                <span class="n">db_module</span><span class="o">.</span><span class="n">save_urls</span><span class="p">([</span><span class="n">url</span><span class="p">])</span>
+                <span class="k">print</span> <span class="s">&quot;saving  into database...&quot;</span><span class="p">,</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;no new post found!&quot;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Yiwang ZHENG.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

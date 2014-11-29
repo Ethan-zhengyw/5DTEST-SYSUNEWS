@@ -25,11 +25,9 @@ hostIP = "222.200.180.135"
 def save_urls(urls):
     """Save the urls into database
 
-    Note:
-        When url is already in database, it will just ignore it quietly
+    When url is already in database, it will just ignore it quietly
 
-    Args:
-        urls (list): url list
+    :param urls: url list
 
     """
     #print " saving urls into sysunewsDB.urls...\n+------------------------------------"
@@ -55,11 +53,9 @@ def save_urls(urls):
 def save_news(news):
     """Save news into database
 
-    Note:
-        Will check whether the news is already in database
-    
-    Args:
-        news (dict): a news dictionary 
+    Will check whether the news is already in database
+
+    :param news: a news dictionary 
 
     """
     if check_news(api.get_newsid(news["url"])):
@@ -97,12 +93,9 @@ def save_news(news):
 def save_img(url):
     """Save the image
 
-    Note:
-        the images will be save in directory /home/images/
-        and it will check whether it's already exists
+    The images will be save in directory /home/images/, and it will check whether it's already exists
 
-    Args:
-        url (str): the url of the image, like [images/content/2014-11/20141124172306071544.jpg]
+    :param url: the url of the image, like [images/content/2014-11/20141124172306071544.jpg]
 
     """
     dirname = '/home/' + url[:url.rfind('/')]
@@ -122,13 +115,9 @@ def save_img(url):
 def resave_img(url):
     """overwrite the image
 
-    Note:
-        When images was broken in local host
-        the images will be resave in directory /home/images/
-        and it will not check whether it's already exists
+    When images was broken in local host, the images will be resave in directory /home/images/, and it will not check whether it's already exists
 
-    Args:
-        url (str): the url of the image, like [images/content/2014-11/20141124172306071544.jpg]
+    :param url: the url of the image, like [images/content/2014-11/20141124172306071544.jpg]
 
     """
     dirname = '/home/' + url[:url.rfind('/')]
@@ -150,11 +139,9 @@ def check_news(tablename, newsid):
 
     Can do this in two different ways: refer to table urls or news
 
-    Args:
-        tablename (str): 
+    :param tablename: check the news in which table
 
-    Return:
-        bool: return true if find new with the same newsid in database else return False
+    Return: return `True` if find new with the same newsid in database else return `False`
 
     """
     cursor.execute('select newsid from ' + tablename + ' where newsid = %s', newsid)
@@ -179,13 +166,10 @@ def get_news(module, start, num):
 
     When querying news from DB, the news will be return according to the order of update time, which means the start 1 is the newest news
 
-    Args:
-        module (int): find news from which module
-        start (int): the start index in DB
-        num (int): how many news want to get
-
-    Returns:
-        list: a list of news, every news is a dictionary
+    :param module: find news from which module
+    :param start: the start index in DB
+    :param num: how many news want to get
+    :returns: `result` - a list of news, every news is a dictionary
 
     """
     patterns = ["newsid", "module", "visit_times", "date", "url", "imgs", "author", "editor", "h1", "h2", "source", "maindiv"]
@@ -225,11 +209,8 @@ def get_news(module, start, num):
 def check_news(newsid):
     """Check whether the news already exist in table urls
 
-    Args:
-        tablename (str): 
-
-    Return:
-        bool: return true if find new with the same newsid in table urls else return False
+    :param tablename: check the news in which table
+    :returns: return `True` if find new with the same newsid in table urls else return `False`
 
     """
     sql = 'select * from urls where newsid=' + str(newsid)
@@ -245,11 +226,8 @@ def check_news(newsid):
 def get_module_newsNum(module):
     """get the num of news is certain module
 
-    Args:
-        module (int): find news number of which module
-
-    Returns:
-        int: the number of news of certain module in database
+    :param module: find news number of which module
+    :returns: `int` - the number of news of certain module in database
 
     """
     sql = 'select count(newsid) from urls where module=' + str(module)

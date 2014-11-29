@@ -16,11 +16,10 @@ opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie))
 def find_index_range(data):
     """find the index range
 
-    Args:
-        data (str): content of [http://news2.sysu.edu.cn/news0*/index.htm]
-
-    Returns:
-        start, end: two integer, corresponding to the start and the end of index
+    :param data: content of [http://news2.sysu.edu.cn/news0*/index.htm]
+    :returns:
+        - `start`: an integer, corresponding to the start of index
+        - `end`: an integer, corresponding to the end of index
 
     """
 
@@ -38,11 +37,8 @@ def find_index_range(data):
 def find_news_urls(data, module):
     """Find news url in data
 
-    Args:
-        data (str): content of a page ex.[http://news2.sysu.edu.cn/news01/index1.htm]
-
-    Returns:
-        list: a url list
+    :param data: content of a page ex.[http://news2.sysu.edu.cn/news01/index1.htm]
+    :returns: `list` - a url list
 
     """
 
@@ -69,11 +65,8 @@ def find_news_urls(data, module):
 def find_news(data):
     """Extracting the news attributes from data
 
-    Args:
-        data (str): the conten of a news html page
-
-    Returns:
-        dict: return a structed news
+    :param data: the conten of a news html page
+    :returns: `news` - return a structed news
 
     """
     news = {}
@@ -133,26 +126,18 @@ def find_news(data):
 def find_module(url):
     """Get the module id of a news from its url
     
-    Args:
-        url (str): news' url
-
-    Returns:
-        str: the module id
+    :param url: news' url
+    :returns: `module` - the module id of the news in url
 
     """
-
     return re.search('news0(\d+)', url).group(1)
 
 
 def find_newsid(url):
     """Get the newsid of a news from its url
     
-    Args:
-        url (str): news' url
-
-    Returns:
-        str: the newsid
+    :param url: news' url
+    :returns: `newsid` - the newsid of the news in url
 
     """
-    
     return re.search('(\d+)\.htm', url).group(1)

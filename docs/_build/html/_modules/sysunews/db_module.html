@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sysunews.db_module &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for sysunews.db_module</h1><div class="highlight"><pre>
+<span class="c">#-*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;Module to process database</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">MySQLdb</span>
+
+<span class="kn">import</span> <span class="nn">api</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">MySQLdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+    <span class="n">host</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span>
+    <span class="n">user</span><span class="o">=</span><span class="s">&quot;sysunews&quot;</span><span class="p">,</span>
+    <span class="n">passwd</span><span class="o">=</span><span class="s">&quot;sysunews&quot;</span><span class="p">,</span>
+    <span class="n">db</span><span class="o">=</span><span class="s">&quot;sysunewsDB&quot;</span><span class="p">,</span>
+    <span class="n">charset</span><span class="o">=</span><span class="s">&quot;utf8&quot;</span>
+<span class="p">)</span>
+
+<span class="n">cursor</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="n">hostIP</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="s">&#39;ifconfig | grep inet | grep -v inet6 | grep -v 127 | cut -d &quot;:&quot; -f 2 | cut -d &quot; &quot; -f 1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">hostIP</span> <span class="o">=</span> <span class="s">&quot;222.200.180.135&quot;</span>
+
+<div class="viewcode-block" id="save_urls"><a class="viewcode-back" href="../../sysunews.html#sysunews.db_module.save_urls">[docs]</a><span class="k">def</span> <span class="nf">save_urls</span><span class="p">(</span><span class="n">urls</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save the urls into database</span>
+
+<span class="sd">    When url is already in database, it will just ignore it quietly</span>
+
+<span class="sd">    :param urls: url list</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#print &quot; saving urls into sysunewsDB.urls...\n+------------------------------------&quot;</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">check_news</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">get_newsid</span><span class="p">(</span><span class="n">url</span><span class="p">)):</span>
+            <span class="k">continue</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">newsid</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_newsid</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="n">newsid</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">url</span><span class="p">]</span>
+
+        <span class="c">#print &quot; saving url &quot; + str(count) + &quot;/&quot; + str(length) + &quot;: &quot; + url</span>
+        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;insert into urls values(</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">)&#39;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+
+    <span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="c">#print &quot;+------------------------------------\n Finished &quot;, count, &quot;new url fetched!\n&quot;</span>
+
+</div>
+<div class="viewcode-block" id="save_news"><a class="viewcode-back" href="../../sysunews.html#sysunews.db_module.save_news">[docs]</a><span class="k">def</span> <span class="nf">save_news</span><span class="p">(</span><span class="n">news</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save news into database</span>
+
+<span class="sd">    Will check whether the news is already in database</span>
+
+<span class="sd">    :param news: a news dictionary </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">check_news</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">get_newsid</span><span class="p">(</span><span class="n">news</span><span class="p">[</span><span class="s">&quot;url&quot;</span><span class="p">])):</span>
+        <span class="k">return</span>
+
+    <span class="k">print</span> <span class="s">&quot; saving news: &quot;</span> <span class="o">+</span> <span class="n">news</span><span class="p">[</span><span class="s">&quot;url&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="n">news</span><span class="p">[</span><span class="s">&quot;h1&quot;</span><span class="p">]</span>
+
+    <span class="n">pattern</span> <span class="o">=</span> <span class="s">&#39;(&#39;</span>
+    <span class="n">pattern_sql</span> <span class="o">=</span> <span class="s">&#39;(&#39;</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">news</span><span class="p">:</span>
+        <span class="n">attr_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">news</span><span class="p">[</span><span class="n">attr</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s">&quot;imgs&quot;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">news</span><span class="p">[</span><span class="s">&quot;imgs&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">img_url</span> <span class="ow">in</span> <span class="n">news</span><span class="p">[</span><span class="s">&quot;imgs&quot;</span><span class="p">]:</span>
+                <span class="k">print</span> <span class="s">&quot;saving img&quot;</span><span class="p">,</span> <span class="n">img_url</span>
+                <span class="n">save_img</span><span class="p">(</span><span class="n">img_url</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;newsid&quot;</span><span class="p">,</span> <span class="s">&quot;module&quot;</span><span class="p">,</span> <span class="s">&quot;visit_times&quot;</span><span class="p">]:</span>
+            <span class="n">attr_str</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">attr_str</span><span class="p">)</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attr_str</span><span class="p">)</span>
+
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">pattern</span> <span class="o">+</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">, &#39;</span>
+        <span class="n">attr_db</span> <span class="o">=</span> <span class="p">(</span><span class="n">attr</span> <span class="k">if</span> <span class="n">attr</span> <span class="o">!=</span> <span class="s">&quot;div&quot;</span> <span class="k">else</span> <span class="s">&quot;maindiv&quot;</span><span class="p">)</span>
+        <span class="n">pattern_sql</span> <span class="o">=</span> <span class="n">pattern_sql</span> <span class="o">+</span> <span class="n">attr_db</span> <span class="o">+</span> <span class="s">&#39;, &#39;</span>
+
+    <span class="n">pattern_sql</span> <span class="o">=</span> <span class="n">pattern_sql</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;)&#39;</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="s">&#39;insert into news&#39;</span> <span class="o">+</span> <span class="n">pattern_sql</span> <span class="o">+</span> <span class="s">&#39; values&#39;</span> <span class="o">+</span> <span class="n">pattern</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;)&#39;</span>
+
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+    <span class="n">save_urls</span><span class="p">([</span><span class="n">news</span><span class="p">[</span><span class="s">&quot;url&quot;</span><span class="p">]])</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="save_img"><a class="viewcode-back" href="../../sysunews.html#sysunews.db_module.save_img">[docs]</a><span class="k">def</span> <span class="nf">save_img</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save the image</span>
+
+<span class="sd">    The images will be save in directory /home/images/, and it will check whether it&#39;s already exists</span>
+
+<span class="sd">    :param url: the url of the image, like [images/content/2014-11/20141124172306071544.jpg]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dirname</span> <span class="o">=</span> <span class="s">&#39;/home/&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">[:</span><span class="n">url</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)]</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="s">&#39;/home/&#39;</span> <span class="o">+</span> <span class="n">url</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span>
+            <span class="n">image</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s">&#39;http://news2.sysu.edu.cn/&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="n">image</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="resave_img"><a class="viewcode-back" href="../../sysunews.html#sysunews.db_module.resave_img">[docs]</a><span class="k">def</span> <span class="nf">resave_img</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;overwrite the image</span>
+
+<span class="sd">    When images was broken in local host, the images will be resave in directory /home/images/, and it will not check whether it&#39;s already exists</span>
+
+<span class="sd">    :param url: the url of the image, like [images/content/2014-11/20141124172306071544.jpg]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dirname</span> <span class="o">=</span> <span class="s">&#39;/home/&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">[:</span><span class="n">url</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)]</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="s">&#39;/home/&#39;</span> <span class="o">+</span> <span class="n">url</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;saving image&quot;</span><span class="p">,</span> <span class="n">url</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="n">image</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s">&#39;http://news2.sysu.edu.cn/&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="n">image</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">print</span> <span class="s">&quot;succeed&quot;</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;save img failed!&quot;</span>
+        <span class="k">pass</span>
+
+</div>
+<span class="k">def</span> <span class="nf">check_news</span><span class="p">(</span><span class="n">tablename</span><span class="p">,</span> <span class="n">newsid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check whether the news already exist</span>
+
+<span class="sd">    Can do this in two different ways: refer to table urls or news</span>
+
+<span class="sd">    :param tablename: check the news in which table</span>
+
+<span class="sd">    Return: return `True` if find new with the same newsid in database else return `False`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;select newsid from &#39;</span> <span class="o">+</span> <span class="n">tablename</span> <span class="o">+</span> <span class="s">&#39; where newsid = </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">newsid</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="bp">True</span> <span class="k">if</span> <span class="n">result</span> <span class="k">else</span> <span class="bp">False</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="cleandb"><a class="viewcode-back" href="../../sysunews.html#sysunews.db_module.cleandb">[docs]</a><span class="k">def</span> <span class="nf">cleandb</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Clean the database</span>
+
+<span class="sd">    This fuction will delete two table: urls and news in sysunewsDB</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;truncate table urls&#39;</span><span class="p">)</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;truncate table news&#39;</span><span class="p">)</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="get_news"><a class="viewcode-back" href="../../sysunews.html#sysunews.db_module.get_news">[docs]</a><span class="k">def</span> <span class="nf">get_news</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">num</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Query data from database</span>
+
+<span class="sd">    When querying news from DB, the news will be return according to the order of update time, which means the start 1 is the newest news</span>
+
+<span class="sd">    :param module: find news from which module</span>
+<span class="sd">    :param start: the start index in DB</span>
+<span class="sd">    :param num: how many news want to get</span>
+<span class="sd">    :returns: `result` - a list of news, every news is a dictionary</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;newsid&quot;</span><span class="p">,</span> <span class="s">&quot;module&quot;</span><span class="p">,</span> <span class="s">&quot;visit_times&quot;</span><span class="p">,</span> <span class="s">&quot;date&quot;</span><span class="p">,</span> <span class="s">&quot;url&quot;</span><span class="p">,</span> <span class="s">&quot;imgs&quot;</span><span class="p">,</span> <span class="s">&quot;author&quot;</span><span class="p">,</span> <span class="s">&quot;editor&quot;</span><span class="p">,</span> <span class="s">&quot;h1&quot;</span><span class="p">,</span> <span class="s">&quot;h2&quot;</span><span class="p">,</span> <span class="s">&quot;source&quot;</span><span class="p">,</span> <span class="s">&quot;maindiv&quot;</span><span class="p">]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="s">&#39;select * from news where module=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; order by date desc&quot;</span>
+
+    <span class="k">if</span> <span class="n">start</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">num</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span> <span class="o">+</span> <span class="s">&#39; limit &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">start</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;,&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">():</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">news</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
+            <span class="n">news</span><span class="p">[</span><span class="n">patterns</span><span class="p">[</span><span class="n">count</span><span class="p">]]</span> <span class="o">=</span> <span class="n">attr</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">news</span><span class="p">)</span>
+
+    <span class="n">patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;</span><span class="se">\r</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;NULL&#39;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">news</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">patterns</span><span class="p">:</span>
+            <span class="n">news</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">news</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">news</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">u&#39;阅读次数：&lt;script.*?/script&gt;&#39;</span><span class="p">,</span> <span class="s">u&#39;阅读次数：&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">news</span><span class="p">[</span><span class="s">&quot;visit_times&quot;</span><span class="p">]),</span> <span class="n">news</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">])</span>
+        <span class="n">news</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;/home/sysunews/images&#39;</span><span class="p">,</span> <span class="s">&quot;/home/images&quot;</span><span class="p">,</span> <span class="n">news</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">])</span>
+        <span class="n">news</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;(?&lt;!home)/images&#39;</span><span class="p">,</span> <span class="s">&quot;/home/images&quot;</span><span class="p">,</span> <span class="n">news</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">])</span>
+        <span class="n">news</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;../home/images&#39;</span><span class="p">,</span> <span class="s">&quot;/home/images&quot;</span><span class="p">,</span> <span class="n">news</span><span class="p">[</span><span class="s">&quot;maindiv&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+</div>
+<div class="viewcode-block" id="check_news"><a class="viewcode-back" href="../../sysunews.html#sysunews.db_module.check_news">[docs]</a><span class="k">def</span> <span class="nf">check_news</span><span class="p">(</span><span class="n">newsid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check whether the news already exist in table urls</span>
+
+<span class="sd">    :param tablename: check the news in which table</span>
+<span class="sd">    :returns: return `True` if find new with the same newsid in table urls else return `False`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="s">&#39;select * from urls where newsid=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">newsid</span><span class="p">)</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">newsid</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">return</span> <span class="bp">False</span>
+
+</div>
+<div class="viewcode-block" id="get_module_newsNum"><a class="viewcode-back" href="../../sysunews.html#sysunews.db_module.get_module_newsNum">[docs]</a><span class="k">def</span> <span class="nf">get_module_newsNum</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;get the num of news is certain module</span>
+
+<span class="sd">    :param module: find news number of which module</span>
+<span class="sd">    :returns: `int` - the number of news of certain module in database</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="s">&#39;select count(newsid) from urls where module=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">attr</span>
+
+    <span class="k">return</span> <span class="mi">0</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Yiwang ZHENG.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
